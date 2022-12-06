@@ -1,7 +1,8 @@
 const http = require('http');
 const fs = require("fs");
 const urlLib = require('url')
-const path = require('path')
+const path = require('path');
+const { basename } = require('path');
 
 const server = http.createServer((req, res) => {
     const { headers, url, method } = req;
@@ -82,15 +83,43 @@ const server = http.createServer((req, res) => {
 
         const parsed = urlLib.parse(url);
         const fileName = path.basename(parsed.pathname);
-        console.log(fileName, "=====> fileName");
 
         fs.readFile('./src/img/' + fileName, (error, data) => {
             res.statusCode = 200;
             res.end(data)
         })
+    }else if(url.endsWith("pdf")){
+        const parsed = urlLib.parse(url);
+        const fileName = path.basename(parsed.pathname)
+
+        console.log(fileName);
+        fs.readFile('./src/pdf/' + fileName, (error, data) => {
+            res.statusCode = 200;
+            res.setHeader("content-type", "application/pdf")
+            res.end(data)
+        })
+    }else if (url.endsWith(".css")){
+        const parsed = urlLib.parse(url);
+        const fileName = path.basename(parsed.pathname)
+
+        fs.readFile("./src/css/" + fileName, (error, data) => {
+            res.statusCode = 200;
+            res.setHeader("content-type", "text/css");
+            res.end(data);
+        })
+    }else if(url.endsWith(".js")){
+        const parsed = urlLib.parse(url);
+        const fileName = path.basename(parsed.pathname)
+
+        fs.readFile("./src/js/" + fileName, (error, data) => {
+            res.statusCode = 200;
+            res.setHeader("content-type", "text/js");
+            res.end(data)
+        })
     }
     else {
         res.write("<h1>404 not found</h1>")
+        console.log(url, "=== oldsongui");
         res.end()
     }
 })
